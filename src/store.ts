@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import endOfLifeSlice from "./services/endOfLife";
+import todoSlice, { todosAdapter } from "./services/todosSlice";
 
 const store = configureStore({
 	reducer: {
-		eol: endOfLifeSlice.reducer,
+		todos: todoSlice.reducer,
 	},
 });
 
 export type RootState = ReturnType<typeof store.getState>;
+export const todosSelector = todosAdapter.getSelectors<RootState>((state) => state.todos);
+export const { selectAll: selectAllTodos, selectById: selectTodoById } = todosSelector;
 export default store;

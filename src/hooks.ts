@@ -1,33 +1,28 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
-	fetchSingleCycle,
-	selectDataByName,
-	selectStatusByName,
-} from "./services/endOfLife";
-import type store from "./store";
+	fetchTodos,
+	selectTodosStatus,
+} from "./services/todosSlice";
+import store, { selectAllTodos } from "./store";
 import type { RootState } from "./store";
 
-const useGetSingleCycle = (cycle: string, product: string) => {
+const FetchAllTodos = () => {
 	const dispatch = useDispatch<typeof store.dispatch>();
-	const status = useSelector((state: RootState) =>
-		selectStatusByName(state, product),
-	);
-	const data = useSelector((state: RootState) =>
-		selectDataByName(state, product),
-	);
+	const status = useSelector((state: RootState) => selectTodosStatus(state));
+	const data = selectAllTodos(store.getState());
 
 	useEffect(() => {
-		if (status === undefined) {
-			dispatch(fetchSingleCycle({ cycle, product }));
+		if (status === 'pending') {
+			dispatch(fetchTodos());
 		}
-	}, [cycle, product, status, dispatch]);
+	}, [status, dispatch]);
 
-	const isUninitialised = status === undefined;
-	const isLoading = status === "pending" || status === undefined;
+	const isLoading = status === "pending";
 	const isError = status === "rejected";
-	const isSuccess = status === "fullfilled";
-	return { data, isUninitialised, isLoading, isError, isSuccess };
+	const isSuccess = status === "fulfilled";
+	return { data, isLoading, isError, isSuccess };
 };
 
-export default useGetSingleCycle;
+export { FetchAllTodos };

@@ -58,3 +58,13 @@ form {
 		font-size: 3em;
 	}
 }
+
+ul {
+	list-style: none;
+}
+
+.todo-buttons {
+	button {
+		margin-right: 2em;
+	}
+}

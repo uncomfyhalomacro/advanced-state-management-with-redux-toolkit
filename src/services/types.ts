@@ -1,11 +1,7 @@
-export type SingleCycle = {
+type Todo = {
 	id: number;
-	cycle?: number | string;
-	releaseDate?: string;
-	eol?: string | boolean;
-	latest?: string;
-	link?: string | null;
-	lts?: boolean | string;
-	support?: string | boolean;
-	discontinued?: string | boolean;
-};
+	title: string;
+	completed: boolean;
+}
+
+export default Todo;
