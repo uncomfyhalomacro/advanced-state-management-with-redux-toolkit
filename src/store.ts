@@ -1,6 +1,11 @@
-import { configureStore, createListenerMiddleware } from "@reduxjs/toolkit";
+import {
+	configureStore,
+	createListenerMiddleware,
+	isFulfilled,
+} from "@reduxjs/toolkit";
 import todoSlice, {
 	deleteTodo,
+	fetchTodos,
 	setStateToIdle,
 	todoCompleteToggled,
 	todoDeleted,
@@ -32,6 +37,17 @@ export const todosSelector = todosAdapter.getSelectors<RootState>(
 export const { selectAll: selectAllTodos, selectById: selectTodoById } =
 	todosSelector;
 export default store;
+
+listenerMiddleware.startListening.withTypes<RootState, AppDispatch>()({
+	matcher: isFulfilled(fetchTodos),
+	effect: async (_action, listenerApi) => {
+		listenerApi.cancelActiveListeners();
+		listenerApi.dispatch(setStateToIdle());
+		console.log("Set state to 'idle'");
+		await listenerApi.delay(500);
+		listenerApi.unsubscribe();
+	},
+});
 
 listenerMiddleware.startListening.withTypes<RootState, AppDispatch>()({
 	actionCreator: deleteTodo,

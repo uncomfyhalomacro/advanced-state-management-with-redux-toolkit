@@ -5,8 +5,14 @@ import {
 	type PayloadAction,
 } from "@reduxjs/toolkit";
 import type Todo from "./types";
+import type { AppDispatch, RootState } from "../store";
 
-export const fetchTodos = createAsyncThunk<Todo[]>(
+export const createAppAsyncThunk = createAsyncThunk.withTypes<{
+	state: RootState;
+	dispatch: AppDispatch;
+}>();
+
+export const fetchTodos = createAppAsyncThunk<Todo[]>(
 	"todos/fetchTodos",
 	// biome-ignore lint/suspicious/noExplicitAny: rejectWithValue can be any
 	async (_, { rejectWithValue }: any) => {
