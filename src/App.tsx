@@ -49,6 +49,12 @@ const Todos = () => {
 			id: todo.id,
 			completed: todo.completed,
 		};
+		if (!newTitleTodo.title.trim()) {
+			alert(
+				`Empty string not allowed. Attempted to edit todo id and title: ${todo.id} | ${todo.title}`,
+			);
+			return;
+		}
 		dispatch(todoEditTitle(newTitleTodo));
 		setEditTitle({
 			id: 0,
