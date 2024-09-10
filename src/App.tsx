@@ -100,9 +100,8 @@ const Todos = () => {
 													title: e.currentTarget.value,
 												})
 											}
-											value={
-												editTitle.id === todo.id ? editTitle.title : todo.title
-											}
+											// Resets value if user focuses on another
+											value={editTitle.id === todo.id ? editTitle.title : ""}
 											onChange={(e) =>
 												setEditTitle({
 													id: todo.id,

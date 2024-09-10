@@ -38,6 +38,24 @@ export const { selectAll: selectAllTodos, selectById: selectTodoById } =
 	todosSelector;
 export default store;
 
+// Prefetching data is not the listenerMiddleware's job?
+// listenerMiddleware.startListening.withTypes<RootState, AppDispatch>()({
+// 	predicate(action, currentState, originalState) {
+// 		return originalState.todos.status === "pending" || currentState.todos.status === "pending";
+// 	},
+// 	effect: async (_action, listenerApi) => {
+// 		listenerApi.cancelActiveListeners();
+// 		console.log("Old status: ", listenerApi.getOriginalState().todos.status);
+// 		if (listenerApi.getState().todos.status === "pending") {
+// 			listenerApi.dispatch(fetchTodos());
+// 			console.log("Set state to 'idle'");
+// 			await listenerApi.delay(500);
+// 		} else {
+// 			listenerApi.unsubscribe();
+// 		}
+// 	},
+// });
+
 listenerMiddleware.startListening.withTypes<RootState, AppDispatch>()({
 	matcher: isFulfilled(fetchTodos),
 	effect: async (_action, listenerApi) => {
