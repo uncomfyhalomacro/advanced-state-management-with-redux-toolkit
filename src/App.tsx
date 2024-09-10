@@ -1,4 +1,3 @@
-import { useDispatch } from "react-redux";
 import "./App.css";
 import { useFetchAllTodos } from "./hooks";
 import {
@@ -7,13 +6,13 @@ import {
 	todoEditTitle,
 	toggleTodoCompleted,
 } from "./services/todosSlice";
-import type store from "./store";
 import type Todo from "./services/types";
 import { type FormEvent, useState } from "react";
+import { useAppDispatch } from "./store";
 
 const Todos = () => {
 	const { data, isError, isLoading } = useFetchAllTodos();
-	const dispatch = useDispatch<typeof store.dispatch>();
+	const dispatch = useAppDispatch();
 	const [editTitle, setEditTitle] = useState({
 		id: 0,
 		title: "",
@@ -139,7 +138,7 @@ const Todos = () => {
 };
 
 const DeleteButton = ({ todo }: { todo: Todo }) => {
-	const dispatch = useDispatch<typeof store.dispatch>();
+	const dispatch = useAppDispatch();
 
 	return (
 		<>
@@ -151,7 +150,7 @@ const DeleteButton = ({ todo }: { todo: Todo }) => {
 };
 
 const ToggleButton = ({ todo }: { todo: Todo }) => {
-	const dispatch = useDispatch<typeof store.dispatch>();
+	const dispatch = useAppDispatch();
 
 	return (
 		<>
