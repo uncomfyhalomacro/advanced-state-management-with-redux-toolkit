@@ -54,8 +54,16 @@ listenerMiddleware.startListening.withTypes<RootState, AppDispatch>()({
 	effect: async (action, listenerApi) => {
 		console.log("Performed ", action.type, " on todo id ", action.payload);
 		listenerApi.cancelActiveListeners();
+		const oldTodo = selectTodoById(
+			listenerApi.getOriginalState(),
+			action.payload,
+		);
+		console.log("Old todo:", oldTodo);
 		listenerApi.dispatch(todoDeleted());
 		await listenerApi.delay(500);
+		const isUndefined =
+			selectTodoById(listenerApi.getState(), action.payload) === undefined;
+		console.log("Todo was really removed?", isUndefined);
 		listenerApi.dispatch(setStateToIdle());
 	},
 });
@@ -65,8 +73,15 @@ listenerMiddleware.startListening.withTypes<RootState, AppDispatch>()({
 	effect: async (action, listenerApi) => {
 		console.log("Performed ", action.type, " on todo id ", action.payload);
 		listenerApi.cancelActiveListeners();
+		const oldTodo = selectTodoById(
+			listenerApi.getOriginalState(),
+			action.payload.id,
+		);
+		console.log("Old todo:", oldTodo);
 		listenerApi.dispatch(todoCompleteToggled());
 		await listenerApi.delay(500);
+		const newTodo = selectTodoById(listenerApi.getState(), action.payload.id);
+		console.log("New todo:", newTodo);
 		listenerApi.dispatch(setStateToIdle());
 	},
 });
@@ -75,9 +90,16 @@ listenerMiddleware.startListening.withTypes<RootState, AppDispatch>()({
 	actionCreator: todoEditTitle,
 	effect: async (action, listenerApi) => {
 		console.log("Performed ", action.type, " on todo id ", action.payload);
+		const oldTodo = selectTodoById(
+			listenerApi.getOriginalState(),
+			action.payload.id,
+		);
+		console.log("Old todo:", oldTodo);
 		listenerApi.cancelActiveListeners();
 		listenerApi.dispatch(todoTitleEdited());
 		await listenerApi.delay(500);
+		const newTodo = selectTodoById(listenerApi.getState(), action.payload.id);
+		console.log("New todo:", newTodo);
 		listenerApi.dispatch(setStateToIdle());
 	},
 });
