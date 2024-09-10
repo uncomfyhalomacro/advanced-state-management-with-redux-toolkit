@@ -1,20 +1,15 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 
-import {
-	fetchTodos,
-	selectTodosStatus,
-} from "./services/todosSlice";
-import store, { selectAllTodos } from "./store";
-import type { RootState } from "./store";
+import { fetchTodos } from "./services/todosSlice";
+import store, { selectAllTodos, useAppDispatch, useAppSelector } from "./store";
 
-const FetchAllTodos = () => {
-	const dispatch = useDispatch<typeof store.dispatch>();
-	const status = useSelector((state: RootState) => selectTodosStatus(state));
+const useFetchAllTodos = () => {
+	const dispatch = useAppDispatch();
+	const status = useAppSelector((state) => state.todos.status);
 	const data = selectAllTodos(store.getState());
 
 	useEffect(() => {
-		if (status === 'pending') {
+		if (status === "pending") {
 			dispatch(fetchTodos());
 		}
 	}, [status, dispatch]);
@@ -25,4 +20,4 @@ const FetchAllTodos = () => {
 	return { data, isLoading, isError, isSuccess };
 };
 
-export { FetchAllTodos };
+export { useFetchAllTodos };

@@ -1,14 +1,23 @@
 import { useDispatch } from "react-redux";
 import "./App.css";
-import { FetchAllTodos } from "./hooks";
-import { addTodo, deleteTodo, updateTodo } from "./services/todosSlice";
-import store, { selectTodoById } from "./store";
+import { useFetchAllTodos } from "./hooks";
+import {
+	addTodo,
+	deleteTodo,
+	todoEditTitle,
+	toggleTodoCompleted,
+} from "./services/todosSlice";
+import type store from "./store";
 import type Todo from "./services/types";
 import { type FormEvent, useState } from "react";
 
-const TodoForm = () => {
-	let { data, isError, isLoading } = FetchAllTodos();
+const Todos = () => {
+	const { data, isError, isLoading } = useFetchAllTodos();
 	const dispatch = useDispatch<typeof store.dispatch>();
+	const [editTitle, setEditTitle] = useState({
+		id: 0,
+		title: "",
+	});
 	const [formData, setFormData] = useState({
 		title: "",
 	});
@@ -29,16 +38,22 @@ const TodoForm = () => {
 		setFormData({
 			title: "",
 		});
+	};
 
-		// How not to violate?
-		const {
-			data: newData,
-			isError: newError,
-			isLoading: newLoading,
-		} = FetchAllTodos();
-		data = newData;
-		isError = newError;
-		isLoading = newLoading;
+	const handleEditTitleTodo = (todo: Todo) => {
+		const newTitleTodo: Todo = {
+			// This ensures that when we click a button, it only selects the input element that matches the attribute id which is a
+			// stringified todo.id value.
+			title: (document.getElementById(todo.id.toString()) as HTMLInputElement)
+				.value,
+			id: todo.id,
+			completed: todo.completed,
+		};
+		dispatch(todoEditTitle(newTitleTodo));
+		setEditTitle({
+			id: 0,
+			title: "",
+		});
 	};
 
 	return (
@@ -55,13 +70,82 @@ const TodoForm = () => {
 				</label>
 				<button type="submit">Add Todo</button>
 			</form>
-			<Todos data={data} isError={isError} isLoading={isLoading} />
+			<div>
+				{isLoading ? (
+					<>Loading todos...</>
+				) : isError ? (
+					<>Failed to fetch todos.</>
+				) : data ? (
+					<>
+						<ul>
+							{data.map((todo) => (
+								<li key={todo.id}>
+									<label htmlFor="edit-title">
+										<input
+											// this ensures  each input element is unique!
+											key={todo.id}
+											id={todo.id.toString()}
+											type="text"
+											placeholder={todo.title}
+											// This ensures that the id matches with the element on mouse hover
+											onFocus={(e) =>
+												setEditTitle({
+													id: todo.id,
+													title: e.currentTarget.value,
+												})
+											}
+											onMouseDown={(e) =>
+												setEditTitle({
+													id: todo.id,
+													title: e.currentTarget.value,
+												})
+											}
+											value={
+												editTitle.id === todo.id ? editTitle.title : todo.title
+											}
+											onChange={(e) =>
+												setEditTitle({
+													id: todo.id,
+													title: e.target.value,
+												})
+											}
+										/>
+									</label>
+									<div className="todo-buttons">
+										<ToggleButton todo={todo} />
+										<DeleteButton todo={todo} />
+
+										<button
+											key={todo.id}
+											type="button"
+											onClick={() => handleEditTitleTodo(todo)}
+										>
+											Edit todo title
+										</button>
+									</div>
+								</li>
+							))}
+						</ul>
+					</>
+				) : null}
+			</div>
+		</>
+	);
+};
+
+const DeleteButton = ({ todo }: { todo: Todo }) => {
+	const dispatch = useDispatch<typeof store.dispatch>();
+
+	return (
+		<>
+			<button type="button" onClick={() => dispatch(deleteTodo(todo.id))}>
+				Delete Todo
+			</button>
 		</>
 	);
 };
 
 const ToggleButton = ({ todo }: { todo: Todo }) => {
-	const [isCompleted, setToggleCompleted] = useState(todo.completed);
 	const dispatch = useDispatch<typeof store.dispatch>();
 
 	return (
@@ -69,54 +153,19 @@ const ToggleButton = ({ todo }: { todo: Todo }) => {
 			<button
 				type="button"
 				onClick={() => {
-					dispatch(
-						updateTodo({
-							id: todo.id,
-							changes: { completed: !isCompleted },
-						}),
-					);
-					const data = selectTodoById(store.getState(), todo.id);
-					setToggleCompleted(data.completed);
+					dispatch(toggleTodoCompleted(todo));
 				}}
 			>
-				{isCompleted ? "Completed" : "Click to complete"}
+				{todo.completed ? "Completed" : "Click to complete"}
 			</button>
 		</>
-	);
-};
-
-
-const Todos = ({
-	data,
-	isError,
-	isLoading,
-}: { data: Todo[]; isError: boolean; isLoading: boolean }) => {
-	return (
-		<div>
-			{isLoading ? (
-				<>Loading todos...</>
-			) : isError ? (
-				<>Failed to fetch todos.</>
-			) : data ? (
-				<>
-					<ul>
-						{data.map((todo) => (
-							<li key={todo.id}>
-								<h1>{todo.title}</h1>
-								<div className="todo-buttons"><ToggleButton todo={todo} /><button type="button">Delete Todo</button></div>
-							</li>
-						))}
-					</ul>
-				</>
-			) : null}
-		</div>
 	);
 };
 
 const App = () => {
 	return (
 		<div>
-			<TodoForm />
+			<Todos />
 		</div>
 	);
 };

@@ -61,6 +61,11 @@ form {
 
 ul {
 	list-style: none;
+	input[type="text"] {
+		margin-top: 4em;
+		margin-bottom: 2em;
+		font-size: 2em;
+	}
 }
 
 .todo-buttons {

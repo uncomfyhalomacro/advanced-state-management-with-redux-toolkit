@@ -2,9 +2,9 @@ import {
 	createEntityAdapter,
 	createAsyncThunk,
 	createSlice,
+	type PayloadAction,
 } from "@reduxjs/toolkit";
 import type Todo from "./types";
-import type { RootState } from "../store";
 
 export const fetchTodos = createAsyncThunk<Todo[]>(
 	"todos/fetchTodos",
@@ -32,24 +32,44 @@ export const todosAdapter = createEntityAdapter({
 	selectId: (todo: Todo) => todo.id,
 });
 
+export type TodosAdapter = typeof todosAdapter;
+
 const todosSlice = createSlice({
 	name: "todos",
-	initialState: todosAdapter.getInitialState(
-		{
-			status: "pending",
-		},
-		[],
-	),
+	initialState: todosAdapter.getInitialState({
+		status: "pending",
+	}),
 	reducers: {
 		addTodo: todosAdapter.addOne,
 		updateTodo: todosAdapter.updateOne,
 		deleteTodo: todosAdapter.removeOne,
-		toggleTodoCompleted(state, action) {
-			console.log(action);
+		todoEditTitle(state, action: PayloadAction<Todo>) {
 			todosAdapter.updateOne(state, {
 				id: action.payload.id,
-				changes: { completed: true },
+				changes: { title: action.payload.title },
 			});
+		},
+		todoTitleEdited(state) {
+			state.status = "modified(editedTitle)";
+		},
+		todoDeleted(state) {
+			state.status = "modified(deletion)";
+		},
+		todoCompleteToggled(state) {
+			state.status = "modified(toggleCompleted)";
+		},
+		setStateToIdle(state) {
+			state.status = "idle";
+		},
+		setAllTodos: todosAdapter.setAll,
+		toggleTodoCompleted(state, action: PayloadAction<Todo>) {
+			todosAdapter.updateOne(state, {
+				id: action.payload.id,
+				changes: { completed: !action.payload.completed },
+			});
+		},
+		todosUpdated(state) {
+			state.status = "fulfilled";
 		},
 	},
 	extraReducers: (builder) => {
@@ -57,12 +77,11 @@ const todosSlice = createSlice({
 			state.status = "pending";
 		});
 		builder.addCase(fetchTodos.fulfilled, (state, { payload }) => {
-			const todoEntries: Record<number, Todo> = {};
-			for (const todo of payload) {
-				todoEntries[todo.id] = todo;
-			}
+			// const todoEntries: Record<number, Todo> = {};
+			// for (const todo of payload) {
+			// 	todoEntries[todo.id] = todo;
+			// }
 			todosAdapter.setAll(state, payload);
-			console.log(payload);
 			state.status = "fulfilled";
 		});
 		builder.addCase(fetchTodos.rejected, (state) => {
@@ -71,8 +90,19 @@ const todosSlice = createSlice({
 	},
 });
 
-const selectTodosStatus = (state: RootState) => state.todos.status;
-export { selectTodosStatus };
-export const { addTodo, updateTodo, toggleTodoCompleted, deleteTodo } =
-	todosSlice.actions;
+export type AppActions = typeof todosSlice.actions;
+
+export const {
+	setAllTodos,
+	addTodo,
+	updateTodo,
+	todosUpdated,
+	toggleTodoCompleted,
+	todoCompleteToggled,
+	todoEditTitle,
+	todoTitleEdited,
+	deleteTodo,
+	todoDeleted,
+	setStateToIdle,
+} = todosSlice.actions;
 export default todosSlice;
