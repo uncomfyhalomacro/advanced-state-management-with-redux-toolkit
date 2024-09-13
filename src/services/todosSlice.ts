@@ -40,10 +40,19 @@ export const todosAdapter = createEntityAdapter({
 
 export type TodosAdapter = typeof todosAdapter;
 
+export type ActionStates =
+	| "pending"
+	| "failed"
+	| "idle"
+	| "fulfilled"
+	| "modified(editedTitle)"
+	| "modified(toggleCompleted)"
+	| "modified(deletion)";
+
 const todosSlice = createSlice({
 	name: "todos",
 	initialState: todosAdapter.getInitialState({
-		status: "pending",
+		status: "pending" as ActionStates,
 	}),
 	reducers: {
 		addTodo: todosAdapter.addOne,
@@ -83,10 +92,6 @@ const todosSlice = createSlice({
 			state.status = "pending";
 		});
 		builder.addCase(fetchTodos.fulfilled, (state, { payload }) => {
-			// const todoEntries: Record<number, Todo> = {};
-			// for (const todo of payload) {
-			// 	todoEntries[todo.id] = todo;
-			// }
 			todosAdapter.setAll(state, payload);
 			state.status = "fulfilled";
 		});
