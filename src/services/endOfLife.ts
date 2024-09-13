@@ -23,7 +23,7 @@ const fetchSingleCycle = createAsyncThunk<SingleCycle, SingleCycleAttributes>(
 	},
 );
 
-type RequestState = "pending" | "fullfilled" | "rejected";
+type RequestState = "pending" | "fulfilled" | "rejected";
 
 const endOfLifeSlice = createSlice({
 	name: "endoflife",
@@ -37,7 +37,7 @@ const endOfLifeSlice = createSlice({
 			state.statusByName[action.meta.arg.product] = "pending";
 		});
 		builder.addCase(fetchSingleCycle.fulfilled, (state, action) => {
-			state.statusByName[action.meta.arg.product] = "fullfilled";
+			state.statusByName[action.meta.arg.product] = "fulfilled";
 			state.dataByName[action.meta.arg.product] = action.payload;
 		});
 		builder.addCase(fetchSingleCycle.rejected, (state, action) => {
