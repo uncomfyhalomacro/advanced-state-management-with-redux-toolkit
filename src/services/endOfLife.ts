@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { SingleCycle } from "./types";
 import type { RootState } from "../store";
 
-interface SingleCycleAttributes {
+export interface SingleCycleAttributes {
 	cycle: string;
 	product: string;
 }

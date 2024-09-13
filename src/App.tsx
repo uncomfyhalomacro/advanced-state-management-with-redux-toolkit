@@ -1,11 +1,13 @@
 import { useState } from "react";
 import "./App.css";
 import useGetSingleCycle from "./hooks";
-const Eol = ({ cycle, product }: { cycle: string; product: string }) => {
-	const { data, isError, isLoading } = useGetSingleCycle(
-		cycle.trim().toLowerCase(),
-		product.trim().toLocaleLowerCase(),
-	);
+import type { SingleCycleAttributes } from "./services/endOfLife";
+
+const Eol = ({ cycle, product }: SingleCycleAttributes) => {
+	const { data, isError, isLoading } = useGetSingleCycle({
+		cycle: cycle.trim().toLowerCase(),
+		product: product.trim().toLocaleLowerCase(),
+	});
 	return (
 		<>
 			<div>
@@ -26,13 +28,14 @@ const Eol = ({ cycle, product }: { cycle: string; product: string }) => {
 		</>
 	);
 };
+
 const App = () => {
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = useState<SingleCycleAttributes>({
 		cycle: "",
 		product: "",
 	});
 
-	const [data, setData] = useState({
+	const [data, setData] = useState<SingleCycleAttributes>({
 		cycle: "3.9",
 		product: "python",
 	});
