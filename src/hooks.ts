@@ -26,7 +26,7 @@ const useGetSingleCycle = (cycle: string, product: string) => {
 	const isUninitialised = status === undefined;
 	const isLoading = status === "pending" || status === undefined;
 	const isError = status === "rejected";
-	const isSuccess = status === "fullfilled";
+	const isSuccess = status === "fulfilled";
 	return { data, isUninitialised, isLoading, isError, isSuccess };
 };
 
